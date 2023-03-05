@@ -17,46 +17,108 @@ class FirstViewController: NSViewController {
         return view
     }()
     
-    lazy var firstLine = createLine()
-    lazy var secondLine = createLine()
-    lazy var thirdLine = createLine()
+    lazy var loginButton: NSButton = {
+        let button = NSButton()
+        button.wantsLayer = true
+        button.layer?.backgroundColor = NSColor(named: "blue")?.cgColor
+        button.title = "Войти"
+        button.layer?.cornerRadius = 10
+        button.isBordered = false
+        button.bezelColor = .white
+        button.contentTintColor = .white
+        button.font = NSFont.systemFont(ofSize: 25)
+        
+        button.layer?.cornerRadius = 5.0
+        button.layer?.shadowOpacity = 1.0
+        button.layer?.shadowColor = NSColor.black.cgColor
+        button.layer?.shadowOffset = NSMakeSize(5, 5)
+        button.layer?.shadowRadius = 20
+        return button
+    }()
+    
+    lazy var passwordLine = createLine()
+    lazy var serverLine = createLine()
+    lazy var loginLine = createLine()
+    
+    lazy var loginTextfield: NSTextField = {
+        let textfield = NSTextField()
+        textfield.placeholderAttributedString = NSAttributedString(string: "Логин", attributes: [NSAttributedString.Key.foregroundColor: Asset.Authorization.grey!])
+        textfield.isBordered = false
+        textfield.isEditable = true
+        textfield.textColor = Asset.Authorization.grey
+        textfield.font = NSFont.systemFont(ofSize: 18)
+        textfield.backgroundColor = .clear
+        return textfield
+    }()
+    
+    lazy var passwordTextfield: NSTextField = {
+        let textfield = NSTextField()
+        textfield.placeholderAttributedString = NSAttributedString(string: "Пароль", attributes: [NSAttributedString.Key.foregroundColor: Asset.Authorization.grey!])
+        textfield.isBordered = false
+        textfield.isEditable = true
+        textfield.textColor = Asset.Authorization.grey
+        textfield.font = NSFont.systemFont(ofSize: 18)
+        textfield.backgroundColor = .clear
+        return textfield
+    }()
+    lazy var serverTextfield: NSTextField = {
+        let textfield = NSTextField()
+        textfield.placeholderAttributedString = NSAttributedString(string: "Сервер", attributes: [NSAttributedString.Key.foregroundColor: Asset.Authorization.grey!])
+        textfield.isBordered = false
+        textfield.isEditable = true
+        textfield.textColor = Asset.Authorization.grey
+        textfield.font = NSFont.systemFont(ofSize: 12)
+        textfield.backgroundColor = .clear
+        return textfield
+    }()
+    
+    lazy var errorMessage: NSTextField = {
+        let label = NSTextField()
+        label.stringValue = "Не заполнены обязательные поля"
+        label.isBordered = false
+        label.isEditable = false
+        label.textColor = .red
+        label.font = NSFont.systemFont(ofSize: 12)
+        label.backgroundColor = .clear
+        label.alignment = .center
+        label.maximumNumberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        label.isHidden = true
+        return label
+    }()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        
         setupview()
         setupHierarchy()
         setupLayout()
     }
     
     override func loadView() {
-        self.view = NSView(frame: NSMakeRect(0, 0, 480, 270))
+        self.view = NSView(frame: NSMakeRect(0, 0, 150, 150))
         self.view.wantsLayer = true
+     
         self.view.window?.contentView = self.view
         self.view.superview?.wantsLayer = true
+        
+        
     }
     
     func setupview() {
-
- //       loginButton.bezelColor = NSColor(named: "blue")
- //
- //       firstLine.wantsLayer = true
- //       firstLine.layer?.backgroundColor = .black
- //
- //       secondLine.wantsLayer = true
- //       secondLine.layer?.backgroundColor = .black
- //
- //       therdLine.wantsLayer = true
- //       therdLine.layer?.backgroundColor = .black
-        
-
+        loginButton.action = #selector(loginCheck)
      }
+    
      func setupHierarchy() {
          view.addSubview(backgroundView)
-         view.addSubview(firstLine)
-         view.addSubview(secondLine)
-         view.addSubview(thirdLine)
+         view.addSubview(passwordLine)
+         view.addSubview(serverLine)
+         view.addSubview(loginLine)
+         view.addSubview(loginButton)
+         view.addSubview(loginTextfield)
+         view.addSubview(passwordTextfield)
+         view.addSubview(serverTextfield)
+        view.addSubview(errorMessage)
      }
      
      func setupLayout() {
@@ -64,46 +126,81 @@ class FirstViewController: NSViewController {
              make.left.right.bottom.top.equalToSuperview()
          }
          
-         firstLine.snp.makeConstraints { make in
+         passwordLine.snp.makeConstraints { make in
              make.top.equalTo(view.snp.centerY)
              make.height.equalTo(1)
              make.width.equalTo(392)
              make.centerX.equalTo(view.snp.centerX)
          }
-         secondLine.snp.makeConstraints { make in
-             make.top.equalTo(firstLine.snp.bottom).offset(61)
+         serverLine.snp.makeConstraints { make in
+             make.top.equalTo(passwordLine.snp.bottom).offset(61)
              make.height.equalTo(1)
              make.width.equalTo(392)
              make.centerX.equalTo(view.snp.centerX)
          }
-         thirdLine.snp.makeConstraints { make in
-             make.top.equalTo(firstLine.snp.bottom).inset(61)
+         loginLine.snp.makeConstraints { make in
+             make.top.equalTo(passwordLine.snp.bottom).inset(61)
              make.height.equalTo(1)
              make.width.equalTo(392)
              make.centerX.equalTo(view.snp.centerX)
+         }
+         loginButton.snp.makeConstraints { make in
+             make.top.equalTo(serverLine.snp.bottom).offset(75)
+             make.height.equalTo(50)
+             make.width.equalTo(240)
+             make.centerX.equalTo(view.snp.centerX)
+         }
+         loginTextfield.snp.makeConstraints { make in
+             make.bottom.equalTo(loginLine).inset(6)
+             make.centerX.equalTo(loginLine.snp.centerX)
+             make.width.equalTo(189)
+             make.height.equalTo(24)
+         }
+         passwordTextfield.snp.makeConstraints { make in
+             make.bottom.equalTo(passwordLine).inset(6)
+             make.centerX.equalTo(passwordLine.snp.centerX)
+             make.width.equalTo(189)
+             make.height.equalTo(24)
+         }
+         serverTextfield.snp.makeConstraints { make in
+             make.bottom.equalTo(serverLine).inset(6)
+             make.centerX.equalTo(serverLine.snp.centerX)
+             make.width.equalTo(189)
+             make.height.equalTo(24)
+         }
+         errorMessage.snp.makeConstraints { make in
+             make.top.equalTo(serverLine.snp.bottom).offset(12)
+             make.centerX.equalTo(serverLine.snp.centerX)
+             make.width.equalTo(392)
+             make.height.equalTo(56)
          }
      }
     
-    func createLine() -> NSView {
-        let line = NSView()
-        line.wantsLayer = true
-        line.layer?.backgroundColor = NSColor.black.cgColor
+    @objc func loginCheck() {
+        self.view.window?.contentViewController = SecondViewController()
         
-//        line.shadow = NSShadow()
-
-//        line.layer?.cornerRadius = 5.0
-//        line.layer?.shadowOpacity = 20
-//        line.layer?.shadowColor = NSColor.white.cgColor
-//        line.layer?.shadowOffset = CGSize(width: 0, height: 0)
-//        line.layer?.shadowRadius = 20
-
-        return line
+//        if loginTextfield.stringValue != "", passwordTextfield.stringValue != "", serverTextfield.stringValue != "" {
+//                let fps = FPService(server: serverTextfield.stringValue)
+//                fps.login(user: loginTextfield.stringValue, password: passwordTextfield.stringValue) { [weak self] response, error in
+//                    DispatchQueue.main.async {
+//                        if error == nil && response != nil {
+//                            self?.view.window?.contentViewController = SecondViewController()
+//                        } else {
+//                            self?.errorMessage.isHidden = false
+//                        }
+//                }
+//            }
+//        } else {
+//            self.errorMessage.isHidden = false
+//        }
     }
+   
     
-    func createTextfield() -> NSTextField {
-        let textfield = NSTextField()
-        
-        return textfield
+    func createLine() -> NSView {
+        let view = NSView()
+        view.wantsLayer = true
+        view.layer?.backgroundColor = NSColor.black.cgColor
+        return view
     }
 }
 
